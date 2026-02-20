@@ -1,0 +1,8 @@
+{
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "css.lint.unknownAtRules": "ignore",
+  "go.testFlags": ["-count=1", "-timeout=10m"]
+}
