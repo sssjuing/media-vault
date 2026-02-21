@@ -1,0 +1,26 @@
+server:
+  log_level: warn # debug | info | warn | error
+  secret_key: gboUV8ZUszxKNqdGMy0J51KLZDDo4uXR
+  work_path: /data
+  download_concurrency: 6
+  download_timeout: 60
+  users:
+    - name: user1
+      password: user1
+
+postgres:
+  host: host.docker.internal
+  replicas:
+    - host.docker.internal
+  port: 5432
+  username: medialibadmin
+  password: medialibpassword
+  dbname: medialib_db
+
+minio:
+  host: host.docker.internal
+  port: 9000
+  username: minioadmin
+  password: miniopassword
+  bucket_name: media-lib
+  public_endpoint: 127.0.0.1:9000
