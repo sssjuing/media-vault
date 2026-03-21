@@ -13,8 +13,6 @@ func (h *Handler) Register(g *echo.Group) {
 	g.Use(middleware.JWT())
 	g.GET("/user/whoami", h.CurrentUser)
 
-	g.GET("/video-tags", h.ListVideoTags)
-
 	files := g.Group("/files")
 	files.GET("", h.ListFiles)
 	files.GET("/:folder_name", h.ListFiles)
@@ -26,7 +24,7 @@ func (h *Handler) Register(g *echo.Group) {
 	actress := g.Group("/actresses/:actress_id", middleware.ActressChecker(h.actressRepo))
 	actress.GET("", h.GetActressById)
 	actress.PUT("", h.UpdateActress)
-	actress.DELETE("", h.RemoveActress)
+	actress.DELETE("", h.DeleteActress)
 	actress.GET("/videos", h.GetVideosByActressId)
 
 	// g.GET("/videos", h.ListVideos)

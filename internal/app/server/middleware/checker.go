@@ -7,13 +7,12 @@ import (
 
 	"github.com/sssjuing/media-vault/internal/app/server/repository"
 	"github.com/sssjuing/media-vault/internal/app/server/utils"
-	commonUtils "github.com/sssjuing/media-vault/internal/pkg/utils"
 )
 
 func ActressChecker(ar repository.ActressRepository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
-			actressID, err := commonUtils.ParseUint(c.Param("actress_id"))
+			actressID, err := utils.ParseUint(c.Param("actress_id"))
 			if err != nil {
 				return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 			}
@@ -33,7 +32,7 @@ func ActressChecker(ar repository.ActressRepository) echo.MiddlewareFunc {
 func VideoChecker(vr repository.VideoRepository) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c *echo.Context) error {
-			videoID, err := commonUtils.ParseUint(c.Param("video_id"))
+			videoID, err := utils.ParseUint(c.Param("video_id"))
 			if err != nil {
 				return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 			}

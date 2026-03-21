@@ -6,7 +6,6 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
-	"github.com/sssjuing/media-vault/internal/pkg/utils"
 )
 
 var config *viper.Viper
@@ -21,7 +20,7 @@ func init() {
 	config.AddConfigPath("/etc/media-vault")
 
 	if err := config.ReadInConfig(); err != nil {
-		configsDirPath := utils.GetRootPath() + "/configs"
+		configsDirPath := GetRootPath() + "/configs"
 		config.AddConfigPath(configsDirPath)
 		if err := config.ReadInConfig(); err != nil {
 			log.Fatal("Error on parsing default configuration file. ", err)

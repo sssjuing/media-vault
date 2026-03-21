@@ -25,9 +25,8 @@ func Run() {
 
 	ar := repository.NewActressRepositoryImpl(d)
 	vr := repository.NewVideoRepositoryImpl(d)
-	vtr := repository.NewVideoTagRepositoryImpl(d)
 
-	h := handler.NewHandler(ar, vr, vtr)
+	h := handler.NewHandler(d, ar, vr)
 	v1 := r.Group("/api")
 	h.Register(v1)
 

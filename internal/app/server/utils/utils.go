@@ -1,28 +1,56 @@
 package utils
 
-// import (
-// 	"fmt"
-// 	"log/slog"
+import (
+	"io"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strconv"
+)
 
-// 	"github.com/labstack/gommon/log"
-// 	"github.com/sssjuing/media-vault/internal/pkg/config"
-// )
+func ParseUint(str string) (uint, error) {
+	actressId, err := strconv.ParseUint(str, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return uint(actressId), nil
+}
 
-// func GetLogLevel() *slog.Level {
-// 	cfg := config.GetConfig()
-// 	level := cfg.GetString("server.log_level")
-// 	fmt.Println("log level is", level)
+func ReadFile(filePath string) ([]byte, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
-// 	switch level {
-// 	case "debug":
-// 		return log.DEBUG
-// 	case "info":
-// 		return log.INFO
-// 	case "warn":
-// 		return log.WARN
-// 	case "error":
-// 		return log.ERROR
-// 	default:
-// 		return log.INFO
-// 	}
-// }
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+type File struct {
+	Path string `json:"path"`
+	Size int64  `json:"size"`
+}
+
+func ListFilesInDir(targetDir string) ([]File, error) {
+	files := make([]File, 0, 10)
+	if err := filepath.WalkDir(targetDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.IsDir() {
+			info, err := d.Info()
+			if err != nil {
+				return err
+			}
+			files = append(files, File{path, info.Size()})
+		}
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	return files, nil
+}

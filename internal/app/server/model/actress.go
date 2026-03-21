@@ -1,10 +1,8 @@
 package model
 
 import (
-	"encoding/json"
 	"time"
 
-	"github.com/sssjuing/media-vault/internal/app/server/types"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -26,29 +24,4 @@ type Actress struct {
 	Hobbies      *string         `gorm:"size:255"` // 爱好
 	Notes        *string         // 备注
 	Videos       []*Video        `gorm:"many2many:actress_video"` // 出演的视频
-}
-
-func (a *Actress) DTO() *types.ActressDTO {
-	if a == nil {
-		return nil
-	}
-	return &types.ActressDTO{
-		ID:           a.ID,
-		UniqueName:   a.UniqueName,
-		ChineseName:  a.ChineseName,
-		EnglishName:  a.EnglishName,
-		OtherNames:   (*json.RawMessage)(a.OtherNames),
-		BirthDate:    a.BirthDate,
-		BirthPlace:   a.BirthPlace,
-		Height:       a.Height,
-		Weight:       a.Weight,
-		Measurements: (*json.RawMessage)(a.Measurements),
-		Cup:          a.Cup,
-		BloodGroup:   a.BloodGroup,
-		DebutDate:    a.DebutDate,
-		Hobbies:      a.Hobbies,
-		Notes:        a.Notes,
-		CreatedAt:    a.CreatedAt,
-		UpdatedAt:    a.UpdatedAt,
-	}
 }

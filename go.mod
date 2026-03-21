@@ -8,6 +8,7 @@ require (
 	github.com/gammazero/workerpool v1.2.1
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/jinzhu/copier v0.4.0
 	github.com/labstack/echo-jwt/v5 v5.0.1
 	github.com/labstack/echo/v5 v5.0.4
 	github.com/minio/minio-go/v7 v7.0.98

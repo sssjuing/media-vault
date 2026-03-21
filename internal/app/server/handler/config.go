@@ -1,30 +1,28 @@
 package handler
 
-// import (
-// 	"net/http"
+import (
+	"net/http"
 
-// 	"github.com/labstack/echo/v5"
-// 	"github.com/sssjuing/media-vault/internal/app/server/utils"
-// 	"github.com/sssjuing/media-vault/internal/pkg/config"
-// 	commonUtils "github.com/sssjuing/media-vault/internal/pkg/utils"
-// 	"gopkg.in/yaml.v3"
-// )
+	"github.com/labstack/echo/v5"
+	"github.com/sssjuing/media-vault/internal/app/server/model"
+)
 
-// func (h *Handler) GetVideoTags(c *echo.Context) error {
-// 	filePath := config.GetConfig().ConfigFileUsed()
-// 	bytes, err := commonUtils.ReadFile(filePath)
-// 	if err != nil {
-// 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
-// 	}
+func (h *Handler) GetVideoTags(c *echo.Context) error {
+	var globalSetting model.GlobalSetting
+	h.db.Where("id = ?", true).First(&globalSetting)
+	if globalSetting.VideoTags == nil {
+		return c.JSON(http.StatusOK, []string{})
+	}
+	if globalSetting.VideoTags != nil {
+		return c.JSON(http.StatusOK, globalSetting.VideoTags)
+	}
+	return c.JSON(http.StatusOK, globalSetting.VideoTags)
+}
 
-// 	type Config struct {
-// 		Server struct {
-// 			VideoTags []string `yaml:"video_tags"`
-// 		} `yaml:"server"`
-// 	}
-// 	var cfg Config
-// 	if err := yaml.Unmarshal(bytes, &cfg); err != nil {
-// 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
-// 	}
-// 	return c.JSON(http.StatusOK, cfg.Server.VideoTags)
-// }
+func (h *Handler) SetVideoTags(c *echo.Context) error {
+	var globalSetting model.GlobalSetting
+	h.db.Where("id = ?", true).First(&globalSetting)
+	// globalSetting.VideoTags = datatypes.JSONSlice[string](c.FormValue("video_tags"))
+	h.db.Save(&globalSetting)
+	return c.JSON(http.StatusOK, globalSetting.VideoTags)
+}

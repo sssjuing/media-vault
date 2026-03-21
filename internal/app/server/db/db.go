@@ -33,6 +33,6 @@ func AutoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&model.Actress{},
 		&model.Video{},
-		&model.VideoTag{},
+		&model.GlobalSetting{},
 	)
 }

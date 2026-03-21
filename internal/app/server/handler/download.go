@@ -4,22 +4,29 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/labstack/echo/v5"
 	"github.com/samber/lo"
 	"github.com/sssjuing/media-vault/internal/app/server/download"
-	"github.com/sssjuing/media-vault/internal/app/server/types"
 	"github.com/sssjuing/media-vault/internal/app/server/utils"
 	"github.com/sssjuing/media-vault/internal/pkg/config"
 	"github.com/sssjuing/media-vault/internal/pkg/downloader"
-	commonUtils "github.com/sssjuing/media-vault/internal/pkg/utils"
 )
+
+type resourceResponse struct {
+	ID        string     `json:"id"`
+	URL       string     `json:"url"`
+	Name      string     `json:"name"`
+	Status    string     `json:"status"`
+	CreatedAt *time.Time `json:"created_at"`
+}
 
 func (h *Handler) ListResources(c *echo.Context) error {
 	store := download.GetStore()
 	resources := store.FindAll()
 	hashSet := download.GetHashSet()
-	list := lo.Map(resources, func(r *downloader.Resource, _ int) types.ResourceDTO {
+	list := lo.Map(resources, func(r *downloader.Resource, _ int) *resourceResponse {
 		status := "unfinished"
 		if r.Downloading {
 			status = "downloading"
@@ -28,7 +35,7 @@ func (h *Handler) ListResources(c *echo.Context) error {
 		} else if hashSet.Contains(r.ID) {
 			status = "waiting"
 		}
-		return types.ResourceDTO{
+		return &resourceResponse{
 			ID:        r.ID,
 			URL:       r.M3u8URL,
 			Name:      r.Filename,
@@ -105,7 +112,7 @@ func (h *Handler) SubmitDownload(c *echo.Context) error {
 // ListDownloadedFiles 列出全部下载好的文件路径
 func (h *Handler) ListDownloadedFiles(c *echo.Context) error {
 	workPath := config.GetConfig().GetString("server.work_path")
-	files, err := commonUtils.ListFilesInDir(filepath.Join(workPath, "downloads"))
+	files, err := utils.ListFilesInDir(filepath.Join(workPath, "downloads"))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
 	}
