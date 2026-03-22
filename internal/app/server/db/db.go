@@ -1,32 +1,39 @@
 package db
 
 import (
-	"github.com/samber/lo"
+	"fmt"
+
 	"github.com/sssjuing/media-vault/internal/app/server/model"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/plugin/dbresolver"
 )
 
-func NewDB(dsn string, replicas []string) *gorm.DB {
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+type DatabaseType string
 
-	if err != nil {
-		panic("failed to connect database")
+const (
+	DatabaseTypeSQLite   DatabaseType = "sqlite"
+	DatabaseTypePostgres DatabaseType = "postgres"
+)
+
+func NewDB(dbType DatabaseType, dsn string) (*gorm.DB, error) {
+	var dialector gorm.Dialector
+
+	switch dbType {
+	case DatabaseTypeSQLite:
+		dialector = sqlite.Open(dsn)
+	case DatabaseTypePostgres:
+		dialector = postgres.Open(dsn)
+	default:
+		return nil, fmt.Errorf("unsupported database type: %s", dbType)
 	}
 
-	// 配置读写分离
-	db.Use(dbresolver.Register(dbresolver.Config{
-		Sources: []gorm.Dialector{
-			postgres.Open(dsn), // 主库
-		},
-		Replicas: lo.Map(replicas, func(item string, index int) gorm.Dialector {
-			return postgres.Open(item)
-		}),
-		Policy: dbresolver.RandomPolicy{}, // 负载均衡策略
-	}))
+	db, err := gorm.Open(dialector, &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
 
-	return db
+	return db, nil
 }
 
 func AutoMigrate(db *gorm.DB) error {

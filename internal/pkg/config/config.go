@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/samber/lo"
 	"github.com/spf13/viper"
 )
 
@@ -30,27 +29,6 @@ func init() {
 
 func GetConfig() *viper.Viper {
 	return config
-}
-
-func makeDsn(host string) string {
-	username := config.GetString("postgres.username")
-	password := config.GetString("postgres.password")
-	dbname := config.GetString("postgres.dbname")
-	port := config.GetString("postgres.port")
-	// host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", host, username, password, dbname, port)
-}
-
-func GetPostgresDsn() string {
-	host := config.GetString("postgres.host")
-	return makeDsn(host)
-}
-
-func GetPostgresReplicas() []string {
-	hosts := config.GetStringSlice("postgres.replicas")
-	return lo.Map(hosts, func(host string, index int) string {
-		return makeDsn(host)
-	})
 }
 
 func GetMinioPublicUrl() string {

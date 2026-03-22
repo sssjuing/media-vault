@@ -13,15 +13,20 @@ import (
 	"github.com/sssjuing/media-vault/internal/pkg/config"
 )
 
-func Run() {
+func Start() {
 	r := router.New()
 	// r.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	download.Init(r.Logger)
 
-	dsn := config.GetPostgresDsn()
-	replicas := config.GetPostgresReplicas()
-	d := db.NewDB(dsn, replicas)
+	cfg := config.GetConfig()
+	dbType := db.DatabaseType(cfg.GetString("database.type"))
+	dsn := cfg.GetString("database.dsn")
+	d, err := db.NewDB(dbType, dsn)
+	if err != nil {
+		r.Logger.Error("failed to connect database", "error", err)
+	}
+	db.AutoMigrate(d)
 
 	ar := repository.NewActressRepositoryImpl(d)
 	vr := repository.NewVideoRepositoryImpl(d)

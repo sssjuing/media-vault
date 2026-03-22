@@ -4,12 +4,10 @@ import (
 	"testing"
 
 	"github.com/sssjuing/media-vault/internal/app/server/db"
-	"github.com/sssjuing/media-vault/internal/pkg/config"
 )
 
 func createActressRepository() ActressRepository {
-	dsn := config.GetPostgresDsn()
-	d := db.NewDB(dsn, config.GetPostgresReplicas())
+	d, _ := db.NewDB(db.DatabaseTypeSQLite, "../../../../media-vault.db")
 	return NewActressRepositoryImpl(d)
 }
 

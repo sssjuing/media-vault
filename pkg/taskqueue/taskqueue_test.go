@@ -1,3 +1,5 @@
+//go:build !skip_slow_tests
+
 package taskqueue
 
 import (

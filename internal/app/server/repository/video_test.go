@@ -4,16 +4,14 @@ import (
 	"testing"
 
 	"github.com/sssjuing/media-vault/internal/app/server/db"
-	"github.com/sssjuing/media-vault/internal/pkg/config"
 )
 
 func createVideoRepository() VideoRepository {
-	dsn := config.GetPostgresDsn()
-	d := db.NewDB(dsn, config.GetPostgresReplicas())
+	d, _ := db.NewDB(db.DatabaseTypeSQLite, "../../../../media-vault.db")
 	return NewVideoRepositoryImpl(d)
 }
 
-func TestFindAll(t *testing.T) {
+func TestVideoRepository_FindAll(t *testing.T) {
 	videoRepo := createVideoRepository()
 	videos, _ := videoRepo.FindAll(VidoesQueryOptions{Tags: []string{"OL"}})
 	t.Log(len(videos))
@@ -27,7 +25,7 @@ func TestFindAll(t *testing.T) {
 	t.Log(len(allVideos))
 }
 
-func TestPaginateAll(t *testing.T) {
+func TestVideoRepository_PaginateAll(t *testing.T) {
 	videoRepo := createVideoRepository()
 	videos, _ := videoRepo.PaginateAll(VidoesQueryOptions{Page: 1, Size: 10, Search: "RO", Tags: []string{"OL"}})
 	for _, v := range videos {
@@ -39,7 +37,7 @@ func TestPaginateAll(t *testing.T) {
 	}
 }
 
-func TestCount(t *testing.T) {
+func TestVideoRepository_Count(t *testing.T) {
 	videoRepo := createVideoRepository()
 	count1, _ := videoRepo.Count(VidoesQueryOptions{})
 	t.Log(count1)

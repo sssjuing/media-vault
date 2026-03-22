@@ -8,6 +8,13 @@ server:
     - name: user1
       password: user1
 
+database:
+  type: sqlite # sqlite | postgres
+  dsn: media-vault.db
+  # For PostgreSQL:
+  # type: postgres
+  # dsn: host=localhost user=beehive password=secret dbname=beehive port=5432 sslmode=disable
+
 postgres:
   host: 127.0.0.1
   replicas:
