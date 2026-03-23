@@ -8,14 +8,12 @@ server:
     - name: user1
       password: user1
 
-postgres:
-  host: host.docker.internal
-  replicas:
-    - host.docker.internal
-  port: 5432
-  username: medialibadmin
-  password: medialibpassword
-  dbname: medialib_db
+database:
+  type: sqlite # sqlite | postgres
+  dsn: media-vault.db
+  # For PostgreSQL:
+  # type: postgres
+  # dsn: host=localhost user=beehive password=secret dbname=beehive port=5432 sslmode=disable
 
 minio:
   host: host.docker.internal

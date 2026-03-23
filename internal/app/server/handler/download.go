@@ -96,8 +96,8 @@ type submitDownloadRequest struct {
 // SubmitDownload 创建下载任务并下载
 func (h *Handler) SubmitDownload(c *echo.Context) error {
 	req := &submitDownloadRequest{}
-	if code, err := validateRequest(c, req); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := validateRequest(c, req); err != nil {
+		return err
 	}
 	store := download.GetStore()
 	if r := store.FindByName(req.Name); r != nil {

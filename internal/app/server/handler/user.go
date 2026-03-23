@@ -54,8 +54,8 @@ func newTokenResponse(u *model.User) *tokenResponse {
 func (h *Handler) Login(c *echo.Context) error {
 	// redirectUri := c.QueryParam("redirect_uri")
 	req := &userLoginRequest{}
-	if code, err := req.bind(c); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := req.bind(c); err != nil {
+		return err
 	}
 	users, err := config.GetUsers()
 	if err != nil {

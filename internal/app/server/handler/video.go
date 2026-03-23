@@ -129,8 +129,8 @@ type paginateVideosResponse struct {
 
 func (h *Handler) SearchVideos(c *echo.Context) error {
 	var opts repository.VidoesQueryOptions
-	if code, err := validateRequest(c, &opts); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := validateRequest(c, &opts); err != nil {
+		return err
 	}
 	videos, err := h.videoRepo.PaginateAll(opts)
 	if err != nil {
@@ -148,8 +148,8 @@ func (h *Handler) SearchVideos(c *echo.Context) error {
 
 func (h *Handler) CreateVideo(c *echo.Context) error {
 	var req videoCreateRequest
-	if code, err := validateRequest(c, &req); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := validateRequest(c, &req); err != nil {
+		return err
 	}
 	v := req.toModel()
 	err := h.videoRepo.Create(v)
@@ -167,8 +167,8 @@ func (h *Handler) GetVideoById(c *echo.Context) error {
 func (h *Handler) UpdateVideo(c *echo.Context) error {
 	v := c.Get("video").(*model.Video)
 	var req videoUpdateRequest
-	if code, err := validateRequest(c, &req); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := validateRequest(c, &req); err != nil {
+		return err
 	}
 	req.updateModel(v)
 	if err := h.videoRepo.Update(v); err != nil {

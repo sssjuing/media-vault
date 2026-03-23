@@ -4,16 +4,17 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v5"
+	"github.com/sssjuing/media-vault/internal/app/server/utils"
 )
 
-func validateRequest[T any](c *echo.Context, req *T) (int, error) {
+func validateRequest[T any](c *echo.Context, req *T) error {
 	if err := c.Bind(req); err != nil {
-		return http.StatusBadRequest, err
+		return c.JSON(http.StatusBadRequest, utils.NewError(err))
 	}
 	if err := c.Validate(req); err != nil {
-		return http.StatusUnprocessableEntity, err
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
 	}
-	return 0, nil
+	return nil
 }
 
 type userLoginRequest struct {
@@ -21,6 +22,6 @@ type userLoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-func (r *userLoginRequest) bind(c *echo.Context) (int, error) {
+func (r *userLoginRequest) bind(c *echo.Context) error {
 	return validateRequest(c, r)
 }

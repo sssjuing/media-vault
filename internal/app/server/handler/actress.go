@@ -93,8 +93,8 @@ func (h *Handler) ListActresses(c *echo.Context) error {
 
 func (h *Handler) CreateActress(c *echo.Context) error {
 	var req actressCreateRequest
-	if code, err := validateRequest(c, &req); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := validateRequest(c, &req); err != nil {
+		return err
 	}
 	a := req.toModel()
 	err := h.actressRepo.Create(a)
@@ -112,8 +112,8 @@ func (h *Handler) GetActressById(c *echo.Context) error {
 func (h *Handler) UpdateActress(c *echo.Context) error {
 	a := c.Get("actress").(*model.Actress)
 	var req actressUpdateRequest
-	if code, err := validateRequest(c, &req); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := validateRequest(c, &req); err != nil {
+		return err
 	}
 	req.updateModel(a)
 	if err := h.actressRepo.Update(a); err != nil {

@@ -43,8 +43,8 @@ type uploadLocalFileRequest struct {
 
 func (h *Handler) UploadLocalFile(c *echo.Context) error {
 	req := &uploadLocalFileRequest{}
-	if code, err := validateRequest(c, req); err != nil {
-		return c.JSON(code, utils.NewError(err))
+	if err := validateRequest(c, req); err != nil {
+		return err
 	}
 	filename := filepath.Base(req.FilePath)
 	objectPath := filepath.Join(req.TargetDir, filename)
