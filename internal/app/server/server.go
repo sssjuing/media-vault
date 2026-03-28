@@ -31,6 +31,10 @@ func Run() {
 	v1 := r.Group("/api")
 	h.Register(v1)
 
+	serveSPA(r.Group("/login"), "web/login/dist")
+	// serveSPA(r.Group("/console"), "web/console/dist")
+	// serveSPA(r.Group("/h5"), "web/h5/dist")
+
 	r.GET("/", func(c *echo.Context) error {
 		ua := strings.ToLower(c.Request().UserAgent())
 		isMobile := strings.Contains(ua, "mobile") ||
@@ -46,4 +50,11 @@ func Run() {
 	if err := r.Start(":1323"); err != nil {
 		r.Logger.Error("failed to start server", "error", err)
 	}
+}
+
+func serveSPA(g *echo.Group, distPath string) {
+	g.Static("/assets", distPath+"/assets")
+	g.GET("*", func(c *echo.Context) error {
+		return c.File(distPath + "/index.html")
+	})
 }
