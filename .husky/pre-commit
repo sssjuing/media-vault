@@ -1,0 +1,9 @@
+pnpm lint
+pnpm test
+pnpm format:check
+
+# go test $(go list ./... | grep -v "internal/pkg/downloader" | grep -v "internal/pkg/oss" | grep -v "pkg/taskqueue")
+go test ./... -tags="skip_slow_tests"
+
+git update-index --again
+# exit 1

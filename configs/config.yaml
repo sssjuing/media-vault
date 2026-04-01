@@ -1,0 +1,33 @@
+server:
+  log_level: debug # debug | info | warn | error
+  secret_key: gboUV8ZUszxKNqdGMy0J51KLZDDo4uXR
+  work_path: /data
+  download_concurrency: 6
+  download_timeout: 60
+  users:
+    - name: user1
+      password: user1
+
+database:
+  type: sqlite # sqlite | postgres
+  dsn: media-vault.db
+  # For PostgreSQL:
+  # type: postgres
+  # dsn: host=localhost user=beehive password=secret dbname=beehive port=5432 sslmode=disable
+
+postgres:
+  host: 127.0.0.1
+  replicas:
+    - 127.0.0.1
+  port: 5432
+  username: postgresadmin
+  password: postgrespassword
+  dbname: testdb
+
+minio:
+  host: 127.0.0.1
+  port: 9000
+  username: minioadmin
+  password: miniopassword
+  bucket_name: media-lib
+  public_endpoint: 127.0.0.1:9000
