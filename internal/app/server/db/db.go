@@ -39,6 +39,8 @@ func NewDB(dbType DatabaseType, dsn string) (*gorm.DB, error) {
 func AutoMigrate(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&model.Actress{},
+		&model.ActressNameSet{},
+		&model.ActressName{},
 		&model.Video{},
 		&model.GlobalSetting{},
 	)
