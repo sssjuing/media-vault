@@ -9,7 +9,7 @@ import (
 )
 
 // 使用超时下载单个文件
-func downloadFileWithTimeout(url, filepath string, timeout time.Duration) error {
+func downloadFileWithTimeout(url, referer, filepath string, timeout time.Duration) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
@@ -17,6 +17,7 @@ func downloadFileWithTimeout(url, filepath string, timeout time.Duration) error 
 	if err != nil {
 		return err
 	}
+	req.Header.Set("Referer", referer)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

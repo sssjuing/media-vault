@@ -14,22 +14,8 @@ func New() *echo.Echo {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 
-	e.Group("/login").Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:   "web/login",
-		Index:  "index.html",
-		Browse: false,
-		HTML5:  true,
-	}))
-
-	e.Group("/h5").Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:   "web/h5",
-		Index:  "index.html",
-		Browse: false,
-		HTML5:  true,
-	}))
-
-	e.Group("/console").Use(middleware.StaticWithConfig(middleware.StaticConfig{
-		Root:   "web/console",
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		Root:   "web/dist",
 		Index:  "index.html",
 		Browse: false,
 		HTML5:  true,

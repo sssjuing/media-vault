@@ -33,8 +33,9 @@ type videoResponse struct {
 	VideoUrl     *string            `json:"video_url"`
 	Mosaic       *bool              `json:"mosaic"`
 	Tags         *json.RawMessage   `json:"tags"`
-	M3U8Url      *string            `json:"m3u8_url"`
 	Synopsis     *string            `json:"synopsis"`
+	M3u8Url      *string            `json:"m3u8_url"`
+	M3u8Referer  *string            `json:"m3u8_referer"`
 	CreatedAt    time.Time          `json:"created_at"`
 	UpdatedAt    time.Time          `json:"updated_at"`
 }
@@ -54,7 +55,6 @@ func newVideoResponse(v *model.Video) *videoResponse {
 		return newActressResponse(a)
 	})
 	resp.Tags = (*json.RawMessage)(v.Tags)
-	resp.M3U8Url = v.M3U8URL
 	return &resp
 }
 
@@ -72,7 +72,8 @@ type videoCreateRequest struct {
 	VideoPath    *string             `json:"video_path"`
 	Mosaic       *bool               `json:"mosaic"`
 	Tags         *json.RawMessage    `json:"tags"`
-	M3U8Url      *string             `json:"m3u8_url"`
+	M3u8Url      *string             `json:"m3u8_url"`
+	M3u8Referer  *string             `json:"m3u8_referer"`
 	Synopsis     *string             `json:"synopsis"`
 }
 
@@ -86,7 +87,8 @@ type videoUpdateRequest struct {
 	VideoPath    *string             `json:"video_path"`
 	Mosaic       *bool               `json:"mosaic"`
 	Tags         *json.RawMessage    `json:"tags"`
-	M3U8Url      *string             `json:"m3u8_url"`
+	M3u8Url      *string             `json:"m3u8_url"`
+	M3u8Referer  *string             `json:"m3u8_referer"`
 	Synopsis     *string             `json:"synopsis"`
 }
 
@@ -99,7 +101,6 @@ func (r *videoCreateRequest) toModel() *model.Video {
 		return actress
 	})
 	m.Tags = (*datatypes.JSON)(r.Tags)
-	m.M3U8URL = r.M3U8Url
 	return &m
 }
 
@@ -119,7 +120,6 @@ func (r *videoUpdateRequest) updateModel(v *model.Video) {
 		})
 	}
 	v.Tags = (*datatypes.JSON)(r.Tags)
-	v.M3U8URL = r.M3U8Url
 }
 
 type paginateVideosResponse struct {

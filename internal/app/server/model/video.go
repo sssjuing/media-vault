@@ -19,6 +19,6 @@ type Video struct {
 	Mosaic       *bool           // 是否打马赛克
 	Tags         *datatypes.JSON // 标签，JSON 数组格式存储
 	Synopsis     *string         // 概要
-	M3U8URL      *string         `gorm:"size:1024;column:m3u8_url"` // M3U8 播放列表 URL
-	M3U8Referer  *string         `gorm:"size:1024;column:referer"`  // M3U8 引用来源
+	M3u8URL      *string         `gorm:"size:1024"` // M3U8 播放列表 URL
+	M3u8Referer  *string         `gorm:"size:1024"` // M3U8 引用来源
 }

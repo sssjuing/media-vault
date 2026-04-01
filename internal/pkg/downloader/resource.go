@@ -14,7 +14,8 @@ type SegmentRow struct {
 
 type Resource struct {
 	ID          string       // m3u8 + name 的 md5 字符串
-	M3u8URL     string       //
+	M3u8URL     string       // m3u8 播放列表 URL
+	M3u8Referer string       // m3u8 引用来源
 	Filename    string       // 文件名, 不含后缀
 	TempDir     string       // 用于临时存放切片文件的目录
 	SegmentList []SegmentRow // 切片数组
@@ -23,16 +24,17 @@ type Resource struct {
 	CreatedAt   *time.Time
 }
 
-func NewResource(url, name, tempDir string, segments []SegmentRow) *Resource {
+func NewResource(url, referer, name, tempDir string, segments []SegmentRow) *Resource {
 	sum := md5.Sum([]byte(url + name))
 	now := time.Now()
 	r := &Resource{
 		// ID:    fmt.Sprintf("%x", md5.Sum([]byte(url+name))),
-		ID:        hex.EncodeToString(sum[:]),
-		M3u8URL:   url,
-		Filename:  name,
-		TempDir:   tempDir,
-		CreatedAt: &now,
+		ID:          hex.EncodeToString(sum[:]),
+		M3u8URL:     url,
+		M3u8Referer: referer,
+		Filename:    name,
+		TempDir:     tempDir,
+		CreatedAt:   &now,
 	}
 	if segments != nil {
 		r.SegmentList = segments

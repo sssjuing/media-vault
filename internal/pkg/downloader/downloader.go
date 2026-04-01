@@ -51,7 +51,14 @@ func New(resource *Resource, opts ...Option) *Downloader {
 func (d *Downloader) makeSegmentList() error {
 	r := d.resource
 	// 下载 m3u8 文件内容
-	resp, err := http.Get(r.M3u8URL)
+	req, err := http.NewRequest("GET", r.M3u8URL, nil)
+	if err != nil {
+		return fmt.Errorf("fail to create request: %w", err)
+	}
+	req.Header.Set("Referer", r.M3u8Referer)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("fail to download m3u8 file: %w", err)
 	}
@@ -105,7 +112,12 @@ func (d *Downloader) downloadSegments(onFinish func(sr *SegmentRow, index int)) 
 			if segment.Status == 1 { // 跳过已经成功下载的 segment
 				return
 			}
-			if err := downloadFileWithTimeout(segment.Url, segment.Path, time.Duration(timeout)*time.Second); err != nil {
+			if err := downloadFileWithTimeout(
+				segment.Url,
+				d.resource.M3u8Referer,
+				segment.Path,
+				time.Duration(timeout)*time.Second,
+			); err != nil {
 				segment.Status = -1
 			} else {
 				segment.Status = 1

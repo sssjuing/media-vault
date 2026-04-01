@@ -8,7 +8,7 @@ func createDownloader(t *testing.T) *Downloader {
 	url := "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/tears-of-steel-audio_eng=64008-video_eng=401000.m3u8"
 	name := "tears-of-steel"
 
-	r := NewResource(url, name, "tmp", nil)
+	r := NewResource(url, "", name, "tmp", nil)
 	sf := WithSegmentFinish(func(sr *SegmentRow, index int) {
 		t.Logf("download %d segment %s finished, status: %d", index, sr.Path, sr.Status)
 	})
