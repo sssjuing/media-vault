@@ -3,6 +3,6 @@ export default {
   extends: ['@commitlint/config-conventional'],
   prompt: {
     useEmoji: true,
-    scopes: [{ value: 'backend', name: 'Backend' }],
+    scopes: [{ name: 'backend:   后端应用', value: 'backend' }],
   },
 };

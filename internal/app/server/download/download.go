@@ -39,9 +39,9 @@ func createDownloader(resource *downloader.Resource, logger *slog.Logger) *downl
 	return downloader.New(resource, wsf, wtf, wl)
 }
 
-func AddTask(url, name string, logger *slog.Logger) error {
+func AddTask(url, referer, name string, logger *slog.Logger) error {
 	workPath := config.GetConfig().GetString("server.work_path")
-	resource := downloader.NewResource(url, name, filepath.Join(workPath, "tmp", name), nil)
+	resource := downloader.NewResource(url, referer, name, filepath.Join(workPath, "tmp", name), nil)
 	if ok := hashSet.Add(resource.ID); !ok {
 		return fmt.Errorf("task %s is already included in the queue, please do not add it repeatedly", name)
 	}

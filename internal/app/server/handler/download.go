@@ -89,8 +89,9 @@ func (h *Handler) DownloadResource(c *echo.Context) error {
 }
 
 type submitDownloadRequest struct {
-	Url  string `json:"url" validate:"required"`
-	Name string `json:"name" validate:"required"`
+	Url     string `json:"url" validate:"required"`
+	Referer string `json:"referer" validate:"required"`
+	Name    string `json:"name" validate:"required"`
 }
 
 // SubmitDownload 创建下载任务并下载
@@ -103,7 +104,7 @@ func (h *Handler) SubmitDownload(c *echo.Context) error {
 	if r := store.FindByName(req.Name); r != nil {
 		return c.JSON(http.StatusConflict, utils.NewError(fmt.Errorf("resource name already exist")))
 	}
-	if err := download.AddTask(req.Url, req.Name, c.Logger()); err != nil {
+	if err := download.AddTask(req.Url, req.Referer, req.Name, c.Logger()); err != nil {
 		return c.JSON(http.StatusServiceUnavailable, utils.NewError(err))
 	}
 	return c.NoContent(http.StatusAccepted)
