@@ -16,10 +16,10 @@ const (
 // ActressName 演员单个名字，属于某个名字集
 type ActressName struct {
 	gorm.Model
-	NameSetID uint            `gorm:"not null;index:idx_name_set_id"`           // 所属的名字集ID
-	NameSet   *ActressNameSet `gorm:"foreignKey:NameSetID"`                     // 所属的名字集
-	Name      string          `gorm:"size:128;not null;index:idx_actress_name"` // 名字内容
-	NameType  NameType        `gorm:"size:32;not null;index:idx_name_type"`     // 名字类型（如：日文名、中文名、英文名等）
+	NameSetID uint            `gorm:"not null;index:idx_name_set_id" json:"name_set_id"`     // 所属的名字集ID
+	NameSet   *ActressNameSet `gorm:"foreignKey:NameSetID" json:"name_set"`                  // 所属的名字集
+	Name      string          `gorm:"size:128;not null;index:idx_actress_name" json:"name"`  // 名字内容
+	NameType  NameType        `gorm:"size:32;not null;index:idx_name_type" json:"name_type"` // 名字类型（如：日文名、中文名、英文名等）
 }
 
 // ActressNameSet 演员名字集，一套完整的名字（包含多种语言版本），一个演员可以有多套名字

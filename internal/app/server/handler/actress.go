@@ -1,37 +1,43 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/jinzhu/copier"
 	"github.com/labstack/echo/v5"
 	"github.com/samber/lo"
-	"gorm.io/datatypes"
 
 	"github.com/sssjuing/media-vault/internal/app/server/model"
 	"github.com/sssjuing/media-vault/internal/app/server/utils"
 )
 
+type nameResponse struct {
+	Name     string `json:"name"`
+	NameType string `json:"name_type"`
+}
+
+type nameSetResponse struct {
+	ID    uint            `json:"id"`
+	Names []*nameResponse `json:"names"`
+}
+
 type actressResponse struct {
-	ID           uint             `json:"id"`
-	UniqueName   string           `json:"unique_name"`
-	ChineseName  string           `json:"chinese_name"`
-	EnglishName  *string          `json:"english_name"`
-	OtherNames   *json.RawMessage `json:"other_names"`
-	BirthDate    *time.Time       `json:"birth_date"`
-	BirthPlace   *string          `json:"birth_place"`
-	Height       *int             `json:"height"`
-	Weight       *int             `json:"weight"`
-	Measurements *json.RawMessage `json:"measurements"`
-	Cup          *string          `json:"cup"`
-	BloodGroup   *string          `json:"blood_group"`
-	DebutDate    *time.Time       `json:"debut_date"`
-	Hobbies      *string          `json:"hobbies"`
-	Notes        *string          `json:"notes"`
-	CreatedAt    time.Time        `json:"created_at"`
-	UpdatedAt    time.Time        `json:"updated_at"`
+	ID         uint               `json:"id"`
+	UniqueName string             `json:"unique_name"`
+	NameSets   []*nameSetResponse `json:"name_sets"`
+	BirthDate  *time.Time         `json:"birth_date"`
+	BirthPlace *string            `json:"birth_place"`
+	Height     *int               `json:"height"`
+	Weight     *int               `json:"weight"`
+	BWH        *model.BWH         `json:"bwh"`
+	Cup        *string            `json:"cup"`
+	BloodGroup *string            `json:"blood_group"`
+	DebutDate  *time.Time         `json:"debut_date"`
+	Hobbies    *string            `json:"hobbies"`
+	Notes      *string            `json:"notes"`
+	CreatedAt  time.Time          `json:"created_at"`
+	UpdatedAt  time.Time          `json:"updated_at"`
 }
 
 func newActressResponse(a *model.Actress) *actressResponse {
@@ -40,26 +46,55 @@ func newActressResponse(a *model.Actress) *actressResponse {
 	}
 	var resp actressResponse
 	_ = copier.Copy(&resp, a)
-	resp.OtherNames = (*json.RawMessage)(a.OtherNames)
-	resp.Measurements = (*json.RawMessage)(a.Measurements)
+
+	if a.NameSets != nil {
+		resp.NameSets = lo.Map(a.NameSets, func(ns *model.ActressNameSet, _ int) *nameSetResponse {
+			nsResp := &nameSetResponse{
+				ID: ns.ID,
+			}
+			if ns.Names != nil {
+				nsResp.Names = lo.Map(ns.Names, func(n *model.ActressName, _ int) *nameResponse {
+					return &nameResponse{
+						Name:     n.Name,
+						NameType: string(n.NameType),
+					}
+				})
+			}
+			return nsResp
+		})
+	}
+
 	return &resp
 }
 
+type nameRequest struct {
+	Name     string `json:"name" validate:"required"`
+	NameType string `json:"name_type" validate:"required"`
+}
+
+type nameSetRequest struct {
+	Names []*nameRequest `json:"names" validate:"required,dive"`
+}
+
+type bwhRequest struct {
+	Bust  *int `json:"bust"`
+	Waist *int `json:"waist"`
+	Hips  *int `json:"hips"`
+}
+
 type actressCreateRequest struct {
-	UniqueName   string           `json:"unique_name" validate:"required"`
-	ChineseName  string           `json:"chinese_name" validate:"required"`
-	EnglishName  *string          `json:"english_name"`
-	OtherNames   *json.RawMessage `json:"other_names"`
-	BirthDate    *time.Time       `json:"birth_date"`
-	BirthPlace   *string          `json:"birth_place"`
-	Height       *int             `json:"height"`
-	Weight       *int             `json:"weight"`
-	Measurements *json.RawMessage `json:"measurements"`
-	Cup          *string          `json:"cup"`
-	BloodGroup   *string          `json:"blood_group"`
-	DebutDate    *time.Time       `json:"debut_date"`
-	Hobbies      *string          `json:"hobbies"`
-	Notes        *string          `json:"notes"`
+	UniqueName string            `json:"unique_name" validate:"required"`
+	NameSets   []*nameSetRequest `json:"name_sets" validate:"required,dive"`
+	BirthDate  *time.Time        `json:"birth_date"`
+	BirthPlace *string           `json:"birth_place"`
+	Height     *int              `json:"height"`
+	Weight     *int              `json:"weight"`
+	BWH        *bwhRequest       `json:"bwh"`
+	Cup        *string           `json:"cup"`
+	BloodGroup *string           `json:"blood_group"`
+	DebutDate  *time.Time        `json:"debut_date"`
+	Hobbies    *string           `json:"hobbies"`
+	Notes      *string           `json:"notes"`
 }
 
 type actressUpdateRequest struct {
@@ -70,15 +105,58 @@ type actressUpdateRequest struct {
 func (r *actressCreateRequest) toModel() *model.Actress {
 	var m model.Actress
 	_ = copier.Copy(&m, r)
-	m.OtherNames = (*datatypes.JSON)(r.OtherNames)
-	m.Measurements = (*datatypes.JSON)(r.Measurements)
+
+	if r.NameSets != nil {
+		m.NameSets = lo.Map(r.NameSets, func(nsr *nameSetRequest, _ int) *model.ActressNameSet {
+			ns := &model.ActressNameSet{}
+			if nsr.Names != nil {
+				ns.Names = lo.Map(nsr.Names, func(nr *nameRequest, _ int) *model.ActressName {
+					return &model.ActressName{
+						Name:     nr.Name,
+						NameType: model.NameType(nr.NameType),
+					}
+				})
+			}
+			return ns
+		})
+	}
+
+	if r.BWH != nil {
+		m.BWH = &model.BWH{
+			Bust:  r.BWH.Bust,
+			Waist: r.BWH.Waist,
+			Hips:  r.BWH.Hips,
+		}
+	}
+
 	return &m
 }
 
 func (r *actressUpdateRequest) updateModel(a *model.Actress) {
 	_ = copier.Copy(a, r)
-	a.OtherNames = (*datatypes.JSON)(r.OtherNames)
-	a.Measurements = (*datatypes.JSON)(r.Measurements)
+
+	if r.NameSets != nil {
+		a.NameSets = lo.Map(r.NameSets, func(nsr *nameSetRequest, _ int) *model.ActressNameSet {
+			ns := &model.ActressNameSet{}
+			if nsr.Names != nil {
+				ns.Names = lo.Map(nsr.Names, func(nr *nameRequest, _ int) *model.ActressName {
+					return &model.ActressName{
+						Name:     nr.Name,
+						NameType: model.NameType(nr.NameType),
+					}
+				})
+			}
+			return ns
+		})
+	}
+
+	if r.BWH != nil {
+		a.BWH = &model.BWH{
+			Bust:  r.BWH.Bust,
+			Waist: r.BWH.Waist,
+			Hips:  r.BWH.Hips,
+		}
+	}
 }
 
 func (h *Handler) ListActresses(c *echo.Context) error {
