@@ -17,8 +17,10 @@ func TestVideoRepository_FindAll(t *testing.T) {
 	t.Log(len(videos))
 	for _, v := range videos {
 		t.Log("video:", v.SerialNumber)
-		for _, a := range v.Actresses {
-			t.Log("actress:", a.UniqueName)
+		for _, nameSet := range v.ActressNameSets {
+			if nameSet.Actress != nil {
+				t.Log("actress:", nameSet.Actress.UniqueName)
+			}
 		}
 	}
 	allVideos, _ := videoRepo.FindAll(VidoesQueryOptions{})

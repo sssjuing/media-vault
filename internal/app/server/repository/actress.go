@@ -27,7 +27,7 @@ func NewActressRepositoryImpl(db *gorm.DB) *ActressRepositoryImpl {
 
 func (r *ActressRepositoryImpl) FindAll() ([]model.Actress, error) {
 	var actresses []model.Actress
-	if err := r.db.Order("CONVERT_TO(chinese_name, 'GBK')").Find(&actresses).Error; err != nil {
+	if err := r.db.Preload("NameSets").Preload("NameSets.Names").Order("created_at desc").Find(&actresses).Error; err != nil {
 		return nil, err
 	}
 	return actresses, nil
@@ -35,7 +35,7 @@ func (r *ActressRepositoryImpl) FindAll() ([]model.Actress, error) {
 
 func (r *ActressRepositoryImpl) FindByID(id uint) (*model.Actress, error) {
 	var a model.Actress
-	if err := r.db.First(&a, id).Error; err != nil {
+	if err := r.db.Preload("NameSets").Preload("NameSets.Names").First(&a, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -57,12 +57,16 @@ func (r *ActressRepositoryImpl) Delete(a *model.Actress) error {
 }
 
 func (r *ActressRepositoryImpl) FindVideos(id uint) ([]*model.Video, error) {
-	var actress model.Actress
-	r.db.
-		Preload("Actresses").
-		Joins("JOIN actress_video ON videos.id = actress_video.video_id").
-		Where("actress_video.actress_id = ?", id).
+	var videos []*model.Video
+	if err := r.db.
+		Preload("ActressNameSets").
+		Preload("ActressNameSets.Actress").
+		Joins("JOIN video_actress_name_set ON videos.id = video_actress_name_set.video_id").
+		Joins("JOIN actress_name_sets ON video_actress_name_set.actress_name_set_id = actress_name_sets.id").
+		Where("actress_name_sets.actress_id = ?", id).
 		Order("videos.release_date desc").
-		Find(&actress.Videos)
-	return actress.Videos, nil
+		Find(&videos).Error; err != nil {
+		return nil, err
+	}
+	return videos, nil
 }

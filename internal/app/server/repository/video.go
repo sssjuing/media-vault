@@ -39,10 +39,10 @@ func (r *VideoRepositoryImpl) FindAll(options VidoesQueryOptions) ([]model.Video
 	var videos []model.Video
 	var err error
 	if len(options.Tags) == 0 {
-		err = r.db.Preload("Actresses").Order("created_at desc").Find(&videos).Error
+		err = r.db.Preload("ActressNameSets").Preload("ActressNameSets.Actress").Preload("ActressNameSets.Names").Order("created_at desc").Find(&videos).Error
 	} else {
 		jsonTags, _ := json.Marshal(options.Tags)
-		err = r.db.Where("tags @> ?", string(jsonTags)).Preload("Actresses").Order("created_at desc").Find(&videos).Error
+		err = r.db.Where("tags @> ?", string(jsonTags)).Preload("ActressNameSets").Preload("ActressNameSets.Actress").Preload("ActressNameSets.Names").Order("created_at desc").Find(&videos).Error
 	}
 	if err != nil {
 		return nil, err
@@ -54,10 +54,10 @@ func (r *VideoRepositoryImpl) PaginateAll(options VidoesQueryOptions) ([]model.V
 	var videos []model.Video
 	var err error
 	if len(options.Tags) == 0 {
-		err = r.db.Preload("Actresses").Order("created_at desc").
+		err = r.db.Preload("ActressNameSets").Preload("ActressNameSets.Actress").Preload("ActressNameSets.Names").Order("created_at desc").
 			Scopes(searchVideos(options.Search), paginate(options.Page, options.Size)).Find(&videos).Error
 	} else {
-		err = r.db.Preload("Actresses").Order("created_at desc").
+		err = r.db.Preload("ActressNameSets").Preload("ActressNameSets.Actress").Preload("ActressNameSets.Names").Order("created_at desc").
 			Scopes(videoTagsFilter(options.Tags), searchVideos(options.Search), paginate(options.Page, options.Size)).Find(&videos).Error
 	}
 	if err != nil {
@@ -92,7 +92,7 @@ func (r *VideoRepositoryImpl) Count(options VidoesQueryOptions) (int64, error) {
 
 func (r *VideoRepositoryImpl) FindByID(id uint) (*model.Video, error) {
 	var v model.Video
-	if err := r.db.Preload("Actresses").First(&v, id).Error; err != nil {
+	if err := r.db.Preload("ActressNameSets").Preload("ActressNameSets.Actress").Preload("ActressNameSets.Names").First(&v, id).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -106,13 +106,13 @@ func (r *VideoRepositoryImpl) Create(v *model.Video) error {
 }
 
 func (r *VideoRepositoryImpl) Update(v *model.Video) error {
-	if err := r.db.Model(v).Association("Actresses").Replace(v.Actresses); err != nil {
+	if err := r.db.Model(v).Association("ActressNameSets").Replace(v.ActressNameSets); err != nil {
 		return err
 	}
 	if err := r.db.Model(v).Updates(v).Error; err != nil {
 		return err
 	}
-	return r.db.Clauses(dbresolver.Write).Preload("Actresses").First(&v, v.ID).Error
+	return r.db.Clauses(dbresolver.Write).Preload("ActressNameSets").Preload("ActressNameSets.Actress").Preload("ActressNameSets.Names").First(&v, v.ID).Error
 }
 
 func (r *VideoRepositoryImpl) Delete(v *model.Video) error {
