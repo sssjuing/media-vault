@@ -1,3 +1,5 @@
+//go:generate ../../../../bin/gen-requests -exclude BWH -output ../handler/actress_requests_gen.go actress.go
+
 package model
 
 import "time"

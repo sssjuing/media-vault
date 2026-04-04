@@ -1,3 +1,5 @@
+//go:generate ../../../../bin/gen-requests -output ../handler/video_requests_gen.go video.go
+
 package model
 
 import (
